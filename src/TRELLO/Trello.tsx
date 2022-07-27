@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
 import s from './Trello.module.css'
-import {log} from "util";
 
+type taskType ={id: number, title: string}
+type boardType ={id: number, title: string, items: taskType[] }
 
 const Trello = () => {
 
-    const [boards, setBoards] = useState(
+    const [boards, setBoards] = useState<boardType[]>(
         [
             {id: 11, title: 'Сделать', items: [{id: 1, title: 'Пойти в магаз'}]},
             {id: 12, title: 'Проверить', items: [{id: 2, title: 'Код ревью'}, {id: 3, title: 'Тестовое'}]},
@@ -13,11 +14,11 @@ const Trello = () => {
         ]
     )
 
-    const [currentBoard, setCurrentBoard] =useState<any>(null)
-    const [currentItem, setCurrentItem] =useState<any>(null)
+    const [currentBoard, setCurrentBoard] =useState<boardType>({} as boardType)
+    const [currentItem, setCurrentItem] =useState<taskType>({}as taskType)
 
     //сработывает, когда мы взяли таску. Здесь сохраняем таску, которую взяли и доску из которой ее взяли
-    function dragStartHandler(e: React.DragEvent<HTMLDivElement>, board:any, item: any) {
+    function dragStartHandler(e: React.DragEvent<HTMLDivElement>, board:boardType, item: taskType) {
         setCurrentBoard(board)
         setCurrentItem(item)
     }
@@ -37,7 +38,7 @@ const Trello = () => {
     }
 
     // отпустили карточку и рассчитываем, что произойдет др действие/ что произойдет, когда мы отпустили карточку на новую доску
-    function dropHandler(e: React.DragEvent<HTMLDivElement>,board:any, item: any) {
+    function dropHandler(e: React.DragEvent<HTMLDivElement>,board:boardType, item: taskType) {
         e.preventDefault()
             //индекс в массиве у карточи, которую мы держим "в руке"
         const currentIndex =  currentBoard.items.indexOf(currentItem)
@@ -50,13 +51,11 @@ const Trello = () => {
 
             //перерисовываем доски
             //итерируемся по всем доскам. меняем старые на новые (включая и ту, что в сет стейте
-        // @ts-ignore
+
         setBoards(boards.map(b=> {
-            // @ts-ignore
-            if(b?.id && b.id === board.id)  {
+            if(b.id === board.id)  {
                 return board
             }
-            // @ts-ignore
             if(b.id === currentBoard.id){
                 return currentBoard
             }
@@ -74,13 +73,10 @@ const Trello = () => {
         board.items.push(currentItem)
         const currentIndex =  currentBoard.items.indexOf(currentItem)
         currentBoard.items.splice(currentIndex,1)
-        // @ts-ignore
         setBoards(boards.map(b=> {
-            // @ts-ignore
-            if(b?.id && b.id === board.id)  {
+            if(b.id === board.id)  {
                 return board
             }
-            // @ts-ignore
             if(b.id === currentBoard.id){
                 return currentBoard
             }
